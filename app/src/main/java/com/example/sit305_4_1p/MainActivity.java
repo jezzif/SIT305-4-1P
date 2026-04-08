@@ -1,5 +1,6 @@
 package com.example.sit305_4_1p;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -7,8 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    RecyclerView recyclerView;
+    /*RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter;
     List<Event> eventList = new ArrayList<>();
 
@@ -40,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             newList[i] = (LocalTime.of(rawList[i][0], rawList[i][1]));
         }
         return newList;
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +57,28 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapter(eventList, this);
-        recyclerView.setAdapter(recyclerViewAdapter);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        Fragment events = new EventListFragment();
+        Fragment add = new EventAddFragment();
 
-        startTimeList = createTimeObjList(rawStartTimesList);
-        endTimeList = createTimeObjList(rawEndTimeList);
+        setCurrentFragment(events);
 
-        for (int i = 0; i < nameList.length; i++) {
-            Event event = new Event(i, nameList[i], startTimeList[i], endTimeList[i], dateList[i], locationList[i], categoryList[i], colorList[i]);
-            eventList.add(event);
-        }
-        eventList.sort(new EventComparator());
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.list) {
+                setCurrentFragment(events);
+            }
+            else if (item.getItemId() == R.id.add) {
+                setCurrentFragment(add);
+            }
+            return true;
+        });
     }
+    private void setCurrentFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainerView, fragment)
+                .commit();
+    }
+
 }

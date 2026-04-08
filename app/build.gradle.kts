@@ -44,8 +44,10 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.fragment)
     implementation(libs.cardview)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
 }
