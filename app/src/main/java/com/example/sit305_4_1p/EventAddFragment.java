@@ -1,5 +1,6 @@
 package com.example.sit305_4_1p;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +22,7 @@ public class EventAddFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private int[] colors = {R.drawable.black, R.drawable.red, R.drawable.orange, R.drawable.green, R.drawable.blue, R.drawable.purple};
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -53,12 +57,30 @@ public class EventAddFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Context context = requireContext();
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_event_add, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_add, container, false);
+
+        Spinner colorSpinner = (Spinner) view.findViewById(R.id.colorSpinner);
+        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        CustomAdapter customAdapter = new CustomAdapter(context, colors);
+        colorSpinner.setAdapter(customAdapter);
+
+        return view;
     }
 }
