@@ -1,26 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EventAddFragment">
 
     <EditText
-        android:id="@+id/editTextText"
-        android:layout_width="245dp"
+        android:id="@+id/nameInput"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
         android:ems="10"
         android:inputType="text"
         android:padding="16dp"
-        android:text="Name" />
+        android:text="Name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
         android:id="@+id/colorSpinner"
         android:layout_width="wrap_content"
+        android:layout_height="59dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toEndOf="@+id/nameInput"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/startTimeBtn"
+        android:layout_width="120dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="25dp"
+        android:backgroundTint="@color/aqua"
+        android:text="Button"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/endTimeBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameInput" />
+
+    <Button
+        android:id="@+id/dateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_marginTop="30dp"
+        android:text="Date"
+        android:backgroundTint="@color/aqua"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startTimeBtn" />
+
+    <Button
+        android:id="@+id/endTimeBtn"
+        android:layout_width="120dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="60dp"
+        android:text="Button"
+        android:backgroundTint="@color/aqua"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startTimeBtn"
+        app:layout_constraintTop_toBottomOf="@+id/nameInput" />
+
+    <TextView
+        android:id="@+id/dash"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginTop="75dp"
-        android:layout_marginRight="16dp" />
-</FrameLayout>
+        android:layout_marginTop="55dp"
+        android:text="-"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toStartOf="@+id/endTimeBtn"
+        app:layout_constraintStart_toEndOf="@+id/startTimeBtn"
+        app:layout_constraintTop_toBottomOf="@+id/nameInput" />
+
+    <EditText
+        android:id="@+id/categoryInput"
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:gravity="center_horizontal"
+        android:inputType="text"
+        android:text="Category"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateBtn" />
+
+    <EditText
+        android:id="@+id/locationInput"
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:gravity="center_horizontal"
+        android:inputType="text"
+        android:text="Location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/categoryInput" />
+
+    <Button
+        android:id="@+id/saveBtn"
+        android:layout_width="180dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/aqua"
+        android:text="Save"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/locationInput" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

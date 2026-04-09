@@ -1,5 +1,7 @@
 package com.example.sit305_4_1p;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -9,7 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TimePicker;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +33,8 @@ public class EventAddFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private int[] colors = {R.drawable.black, R.drawable.red, R.drawable.orange, R.drawable.green, R.drawable.blue, R.drawable.purple};
+    private boolean firstTime = false;
+    private String color;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -67,11 +79,49 @@ public class EventAddFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event_add, container, false);
 
+        DateTimeFormatter hmf = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter dmf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        // Views
+        EditText nameInput = (EditText) view.findViewById(R.id.nameInput);
         Spinner colorSpinner = (Spinner) view.findViewById(R.id.colorSpinner);
+        Button startTimeBtn = (Button) view.findViewById(R.id.startTimeBtn);
+        Button endTimeBtn = (Button) view.findViewById(R.id.endTimeBtn);
+        Button dateBtn = (Button) view.findViewById(R.id.dateBtn);
+        EditText categoryInput = (EditText) view.findViewById(R.id.categoryInput);
+        EditText locationInput = (EditText) view.findViewById(R.id.locationInput);
+        Button saveBtn = (Button) view.findViewById(R.id.saveBtn);
+
+        // Times and Dates
+        LocalTime currentTime = LocalTime.now();
+        startTimeBtn.setText(currentTime.format(hmf));
+        endTimeBtn.setText(currentTime.plusHours(1).format(hmf));
+        LocalDate currentDate = LocalDate.now();
+        dateBtn.setText(currentDate.format(dmf));
+
         colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                switch (position) {
+                    case 0:
+                        color = "black";
+                        break;
+                    case 1:
+                        color = "red";
+                        break;
+                    case 2:
+                        color = "orange";
+                        break;
+                    case 3:
+                        color = "green";
+                        break;
+                    case 4:
+                        color = "blue";
+                        break;
+                    case 5:
+                        color = "purple";
+                        break;
+                }
             }
 
             @Override
@@ -80,6 +130,64 @@ public class EventAddFragment extends Fragment {
 
         CustomAdapter customAdapter = new CustomAdapter(context, colors);
         colorSpinner.setAdapter(customAdapter);
+
+        TimePickerDialog startTimePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                LocalTime time = LocalTime.of(hourOfDay, minute);
+                startTimeBtn.setText(time.format(hmf));
+                if (!firstTime) {
+                    endTimeBtn.setText(time.plusHours(1).format(hmf));
+                }
+            }
+        }, currentTime.getHour(), currentTime.getMinute(), true);
+        TimePickerDialog endTimePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                LocalTime time = LocalTime.of(hourOfDay, minute);
+                endTimeBtn.setText(time.format(hmf));
+                firstTime = true;
+            }
+        }, currentTime.getHour(), currentTime.getMinute(), true);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                LocalDate date = LocalDate.of(year, month + 1, dayOfMonth);
+                dateBtn.setText(date.format(dmf));
+            }
+        }, currentDate.getYear(), (currentDate.getMonthValue() - 1), currentDate.getDayOfMonth());
+
+
+
+        startTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startTimePickerDialog.show();
+            }
+        });
+        endTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endTimePickerDialog.show();
+            }
+        });
+        dateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.show();
+            }
+        });
+
+        String name = String.valueOf(nameInput.getText());
+        String category = String.valueOf(categoryInput.getText());
+        String location = String.valueOf(locationInput.getText());
+
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         return view;
     }
