@@ -6,7 +6,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +36,13 @@ public class EventAddFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private int[] colors = {R.drawable.black, R.drawable.red, R.drawable.orange, R.drawable.green, R.drawable.blue, R.drawable.purple};
     private boolean firstTime = false;
+    private String name, category, location;
     private String color;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private boolean edit = false;
+    private Event openedEvent;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -66,8 +74,8 @@ public class EventAddFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            openedEvent = (Event) getArguments().getSerializable("event");
+            edit = true;
         }
 
     }
@@ -78,6 +86,8 @@ public class EventAddFragment extends Fragment {
         Context context = requireContext();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event_add, container, false);
+
+        EventViewModel viewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
 
         DateTimeFormatter hmf = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dmf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -91,6 +101,8 @@ public class EventAddFragment extends Fragment {
         EditText categoryInput = (EditText) view.findViewById(R.id.categoryInput);
         EditText locationInput = (EditText) view.findViewById(R.id.locationInput);
         Button saveBtn = (Button) view.findViewById(R.id.saveBtn);
+        Button deleteBtn = (Button) view.findViewById(R.id.deleteBtn);
+        deleteBtn.setVisibility(view.INVISIBLE);
 
         // Times and Dates
         LocalTime currentTime = LocalTime.now();
@@ -98,6 +110,10 @@ public class EventAddFragment extends Fragment {
         endTimeBtn.setText(currentTime.plusHours(1).format(hmf));
         LocalDate currentDate = LocalDate.now();
         dateBtn.setText(currentDate.format(dmf));
+
+        startTime = LocalTime.of(currentTime.getHour(), currentTime.getMinute());
+        endTime = startTime.plusHours(1);
+        date = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), currentDate.getDayOfMonth());
 
         colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -123,10 +139,23 @@ public class EventAddFragment extends Fragment {
                         break;
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        if (edit) {
+            nameInput.setText(openedEvent.getName());
+            categoryInput.setText(openedEvent.getCategory());
+            locationInput.setText(openedEvent.getLocation());
+            startTimeBtn.setText(openedEvent.getStartTime().format(hmf));
+            endTimeBtn.setText(openedEvent.getEndTime().format(hmf));
+            dateBtn.setText(openedEvent.getDate().format(dmf));
+            startTime = openedEvent.getStartTime();
+            endTime = openedEvent.getEndTime();
+            date = openedEvent.getDate();
+            color = openedEvent.getColor();
+            deleteBtn.setVisibility(view.VISIBLE);
+        }
 
         CustomAdapter customAdapter = new CustomAdapter(context, colors);
         colorSpinner.setAdapter(customAdapter);
@@ -136,8 +165,10 @@ public class EventAddFragment extends Fragment {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 LocalTime time = LocalTime.of(hourOfDay, minute);
                 startTimeBtn.setText(time.format(hmf));
+                startTime = time;
                 if (!firstTime) {
                     endTimeBtn.setText(time.plusHours(1).format(hmf));
+                    endTime = time.plusHours(1);
                 }
             }
         }, currentTime.getHour(), currentTime.getMinute(), true);
@@ -146,14 +177,16 @@ public class EventAddFragment extends Fragment {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 LocalTime time = LocalTime.of(hourOfDay, minute);
                 endTimeBtn.setText(time.format(hmf));
+                endTime = time;
                 firstTime = true;
             }
         }, currentTime.getHour(), currentTime.getMinute(), true);
         DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                LocalDate date = LocalDate.of(year, month + 1, dayOfMonth);
-                dateBtn.setText(date.format(dmf));
+                LocalDate selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
+                dateBtn.setText(selectedDate.format(dmf));
+                date = selectedDate;
             }
         }, currentDate.getYear(), (currentDate.getMonthValue() - 1), currentDate.getDayOfMonth());
 
@@ -178,14 +211,40 @@ public class EventAddFragment extends Fragment {
             }
         });
 
-        String name = String.valueOf(nameInput.getText());
-        String category = String.valueOf(categoryInput.getText());
-        String location = String.valueOf(locationInput.getText());
+        Fragment eventListFrag = new EventListFragment();
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                name = String.valueOf(nameInput.getText());
+                category = String.valueOf(categoryInput.getText());
+                location = String.valueOf(locationInput.getText());
+                Log.i("myData", name + startTime + endTime);
+                Event newEvent = new Event(name, startTime, endTime, date, location, category, color);
+                if (edit) {
+                    newEvent.setId(openedEvent.getId());
+                    viewModel.update(newEvent);
+                }
+                else {
+                    viewModel.insert(newEvent);
+                }
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerView, eventListFrag)
+                        .setReorderingAllowed(true)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.delete(openedEvent);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerView, eventListFrag)
+                        .setReorderingAllowed(true)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

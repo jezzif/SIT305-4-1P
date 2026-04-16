@@ -1,19 +1,32 @@
 package com.example.sit305_4_1p;
 
-import android.graphics.Color;
-
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-public class Event {
-    private String name, location, category;
-    private int id;
+@Entity(tableName = "events")
+public class Event implements Serializable {
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    @ColumnInfo(name = "name")
+    private String name;
+    @ColumnInfo(name = "location")
+    private String location;
+    @ColumnInfo(name = "category")
+    private String category;
+    @ColumnInfo(name = "color")
     private String color;
+    @ColumnInfo
     private LocalDate date;
-    private LocalTime startTime, endTime;
+    @ColumnInfo
+    private LocalTime startTime;
+    @ColumnInfo
+    private LocalTime endTime;
 
-    public Event(int id, String name, LocalTime startTime, LocalTime endTime, LocalDate date, String location, String category, String color) {
-        this.id = id;
+    public Event(String name, LocalTime startTime, LocalTime endTime, LocalDate date, String location, String category, String color) {
         this.name = name;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -23,7 +36,7 @@ public class Event {
         this.color = color;
     }
     // Getters
-    public int getId() {
+    public long getId() {
         return id;
     }
     public String getName() {
@@ -49,7 +62,7 @@ public class Event {
     }
 
     // Setters
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     public void setName(String name) {
