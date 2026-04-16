@@ -18,22 +18,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EventAddFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class EventAddFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private int[] colors = {R.drawable.black, R.drawable.red, R.drawable.orange, R.drawable.green, R.drawable.blue, R.drawable.purple};
     private boolean firstTime = false;
     private String name, category, location;
@@ -44,29 +36,12 @@ public class EventAddFragment extends Fragment {
     private boolean edit = false;
     private Event openedEvent;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public EventAddFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment EventAddFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static EventAddFragment newInstance(String param1, String param2) {
+    public static EventAddFragment newInstance() {
         EventAddFragment fragment = new EventAddFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -103,6 +78,12 @@ public class EventAddFragment extends Fragment {
         Button saveBtn = (Button) view.findViewById(R.id.saveBtn);
         Button deleteBtn = (Button) view.findViewById(R.id.deleteBtn);
         deleteBtn.setVisibility(view.INVISIBLE);
+
+        // Toasts
+        int duration = Toast.LENGTH_SHORT;
+        Toast deleteToast = Toast.makeText(context, "Event deleted", duration);;
+        Toast strValToast = Toast.makeText(context, "Please fill in all fields", duration);
+        Toast dateValToast = Toast.makeText(context, "Date cannot be in the past", duration);
 
         // Times and Dates
         LocalTime currentTime = LocalTime.now();
@@ -150,11 +131,15 @@ public class EventAddFragment extends Fragment {
             startTimeBtn.setText(openedEvent.getStartTime().format(hmf));
             endTimeBtn.setText(openedEvent.getEndTime().format(hmf));
             dateBtn.setText(openedEvent.getDate().format(dmf));
+            name = openedEvent.getName();
+            category = openedEvent.getCategory();
+            location = openedEvent.getLocation();
             startTime = openedEvent.getStartTime();
             endTime = openedEvent.getEndTime();
             date = openedEvent.getDate();
             color = openedEvent.getColor();
             deleteBtn.setVisibility(view.VISIBLE);
+            Log.i("edit", name + location + category);
         }
 
         CustomAdapter customAdapter = new CustomAdapter(context, colors);
@@ -216,23 +201,35 @@ public class EventAddFragment extends Fragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("isEdit", String.valueOf(edit));
                 name = String.valueOf(nameInput.getText());
                 category = String.valueOf(categoryInput.getText());
                 location = String.valueOf(locationInput.getText());
                 Log.i("myData", name + startTime + endTime);
                 Event newEvent = new Event(name, startTime, endTime, date, location, category, color);
-                if (edit) {
-                    newEvent.setId(openedEvent.getId());
-                    viewModel.update(newEvent);
+                boolean next = true;
+                if (Objects.equals(name, "") || Objects.equals(category, "") || Objects.equals(location, "")) {
+                    strValToast.show();
+                    next = false;
                 }
-                else {
-                    viewModel.insert(newEvent);
+                else if (date.compareTo(currentDate) < 0) {
+                    dateValToast.show();
+                    next = false;
                 }
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainerView, eventListFrag)
-                        .setReorderingAllowed(true)
-                        .addToBackStack(null)
-                        .commit();
+                if (next) {
+                    if (edit) {
+                        newEvent.setId(openedEvent.getId());
+                        viewModel.update(newEvent);
+                    }
+                    else {
+                        viewModel.insert(newEvent);
+                    }
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainerView, eventListFrag)
+                            .setReorderingAllowed(true)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
 
@@ -240,6 +237,7 @@ public class EventAddFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 viewModel.delete(openedEvent);
+                deleteToast.show();
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainerView, eventListFrag)
                         .setReorderingAllowed(true)

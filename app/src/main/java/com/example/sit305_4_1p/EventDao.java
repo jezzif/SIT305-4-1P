@@ -14,7 +14,7 @@ public interface EventDao {
     @Insert
     long insert(Event event);
 
-    @Query("SELECT * FROM events")
+    @Query("SELECT * FROM events ORDER BY date, startTime")
     LiveData<List<Event>> getAllEvents();
 
     @Query("DELETE FROM events WHERE id = :id")
