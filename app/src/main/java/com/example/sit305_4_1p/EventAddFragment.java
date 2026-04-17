@@ -51,8 +51,12 @@ public class EventAddFragment extends Fragment {
         if (getArguments() != null) {
             openedEvent = (Event) getArguments().getSerializable("event");
             edit = true;
+            Log.i("editCheck", openedEvent.getName());
         }
-
+        else {
+            edit = false;
+            Log.i("editCheck", String.valueOf(edit));
+        }
     }
 
     @Override
@@ -84,6 +88,10 @@ public class EventAddFragment extends Fragment {
         Toast deleteToast = Toast.makeText(context, "Event deleted", duration);;
         Toast strValToast = Toast.makeText(context, "Please fill in all fields", duration);
         Toast dateValToast = Toast.makeText(context, "Date cannot be in the past", duration);
+
+        nameInput.getText().clear();
+        categoryInput.getText().clear();
+        locationInput.getText().clear();
 
         // Times and Dates
         LocalTime currentTime = LocalTime.now();
@@ -227,7 +235,7 @@ public class EventAddFragment extends Fragment {
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainerView, eventListFrag)
                             .setReorderingAllowed(true)
-                            .addToBackStack(null)
+                            .remove(EventAddFragment.this)
                             .commit();
                 }
             }
@@ -238,10 +246,11 @@ public class EventAddFragment extends Fragment {
             public void onClick(View v) {
                 viewModel.delete(openedEvent);
                 deleteToast.show();
+                edit = false;
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainerView, eventListFrag)
                         .setReorderingAllowed(true)
-                        .addToBackStack(null)
+                        .remove(EventAddFragment.this)
                         .commit();
             }
         });

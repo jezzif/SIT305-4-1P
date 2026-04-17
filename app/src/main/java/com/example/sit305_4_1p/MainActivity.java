@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         Fragment events = new EventListFragment();
-        Fragment add = new EventAddFragment();
 
         setCurrentFragment(events);
 
@@ -46,12 +45,12 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(events);
             }
             else if (item.getItemId() == R.id.add) {
-                setCurrentFragment(add);
+                setCurrentFragment(EventAddFragment.newInstance());
             }
             return true;
         });
     }
-    private void setCurrentFragment(Fragment fragment) {
+    public void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainerView, fragment)

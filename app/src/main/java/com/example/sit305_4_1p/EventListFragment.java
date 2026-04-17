@@ -75,7 +75,7 @@ public class EventListFragment extends Fragment implements OnItemClickListener {
 
     @Override
     public void onItemClick(int position) {
-        EventAddFragment eventAddFrag = new EventAddFragment();
+        EventAddFragment eventAddFrag = new EventAddFragment().newInstance();
 
         Event event = eventList.get(position);
 
